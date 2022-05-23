@@ -24,6 +24,16 @@ public class StartPagina extends JFrame {
         MonitorButton.addActionListener(e->{
             try {
                 MonitorGUI.main(null);
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (Exception ignored) {}
+                    try {
+                        MonitorClient.main(null);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
