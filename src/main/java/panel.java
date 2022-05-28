@@ -84,15 +84,15 @@ public class panel extends JFrame implements ActionListener {
         Box second_panel = Box.createVerticalBox();
         Font font = new Font("Courier",Font.BOLD,14);
         JLabel BLabel = new JLabel("Beschikbaarheidspercentage:");
-        JLabel TLabel = new JLabel("Totale jaarlijkse kosten");
-        JLabel DLabel = new JLabel("Downtime");
+        JLabel TLabel = new JLabel("Totale jaarlijkse kosten:");
         Optimaliseren = new JButton("Optimaliseren");
         Optimaliseren.addActionListener((ActionListener) this);
 
         // servers
-        JLabel WebLabel = new JLabel("Webserver");
-        JLabel DBLabel = new JLabel("Databaseserver");
-        JLabel FireLabel = new JLabel("Firewall");
+        JLabel WebLabel = new JLabel("Webserver(s):");
+        JLabel DBLabel = new JLabel("Databaseserver(s):");
+        JLabel FireLabel = new JLabel("Firewall:");
+        JLabel DataLabel = new JLabel("Gegevens opzet:");
 
         //Weblabel
         second_panel.add(WebLabel);
@@ -112,7 +112,13 @@ public class panel extends JFrame implements ActionListener {
         FireLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         FireLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        // BLabel
+        //DataLabel
+        second_panel.add(DataLabel);
+        DataLabel.setFont(font);
+        DataLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        DataLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        //BLabel
         second_panel.add(BLabel);
         BLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         BLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -122,17 +128,13 @@ public class panel extends JFrame implements ActionListener {
         TLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         TLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        //DLabel
-        second_panel.add(DLabel);
-        DLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        DLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-
 
         // positie Geselecteerde componenten box
         second_panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        second_panel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        second_panel.setMaximumSize(new Dimension(800, 400));
+        second_panel.setAlignmentY(Component.TOP_ALIGNMENT);
+        second_panel.setMaximumSize(new Dimension(200, 200));
         second_panel.setBorder(BorderFactory.createTitledBorder("Geselecteerde componenten"));
+
 
         // Optimaliseren button
         second_panel.add(Optimaliseren);
