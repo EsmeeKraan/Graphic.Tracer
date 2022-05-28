@@ -26,8 +26,8 @@ public class file_dialog_funcs
         menuBar.add(menuHelp);
 
 
-        JMenuItem open = new JMenuItem("Open bestand");
-        JMenuItem opslaan_bestand = new JMenuItem("Opslaan bestand");
+        JMenuItem open = new JMenuItem("Bestand openen");
+        JMenuItem opslaan_bestand = new JMenuItem("Bestand opslaan");
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
