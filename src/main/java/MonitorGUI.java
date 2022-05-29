@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -32,8 +33,6 @@ public class MonitorGUI {
     static Instant eersteVerbindingstijd = null;
 
     static JCheckBox beschikbaarheidsCheck = new JCheckBox();
-
-    static JButton terugKnop = new JButton("Terug");
 
 
     public static void main(String[] args) {
@@ -169,10 +168,11 @@ public class MonitorGUI {
         });
         beschikbaarheidThread.start();
 
-
+        JButton terugKnop = new JButton("Terug");
         frame.add(new JLabel(), "push, wrap");
         frame.add(terugKnop);
         terugKnop.addActionListener((ef)->{
+            Arrays.stream(StartPagina.getFrames()).forEach(frame1 -> frame1.dispose());
             eersteVerbindingstijd = null;
             beschikbaarheidThread.stop();
             try {
