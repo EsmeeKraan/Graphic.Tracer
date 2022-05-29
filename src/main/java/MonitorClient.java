@@ -13,20 +13,26 @@ import java.util.Scanner;
 
 public class MonitorClient {
 
+    static Socket socket = null;
+
     public static void main(String[] args) throws Exception {
         System.out.println("Verbinden met: 192.168.10.21");
-        for (int i = 0; i < args.length; ++i)
-            System.out.printf("%d: %s\n", i, args[i]);
-        Socket socket = new Socket(args[0], Integer.parseInt(args[1]));
+//        for (int i = 0; i < args.length; ++i)
+//            System.out.printf("%d: %s\n", i, args[i]);
+//        Socket socket = new Socket(args[0], Integer.parseInt(args[1]));
+        if(socket != null){
+            socket.close();
+        }
+        socket = new Socket("localhost", 6789);
         var output = socket.getOutputStream();
         OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         while (true) {
             double CPUload = 0;
 
-            int sampleRate = 20;
+            int sampleRate = 100;
             for (int i = 0; i < sampleRate; i++){
                 CPUload+= osBean.getCpuLoad();
-//                Thread.sleep(1000/sampleRate);
+                Thread.sleep(1000/sampleRate);
             }
             String message = (CPUload/sampleRate) + " " + calucateDiskusage() + "\n";
             output.write(message.getBytes(StandardCharsets.UTF_8));
@@ -50,7 +56,7 @@ public class MonitorClient {
             } catch (IOException ignored) {
             }
         }
-        return totalUsablespace/totalSpace;
+        return 1 - totalUsablespace/totalSpace;
     }
 
 }

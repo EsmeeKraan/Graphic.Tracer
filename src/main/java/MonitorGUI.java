@@ -33,8 +33,23 @@ public class MonitorGUI {
 
     static JCheckBox beschikbaarheidsCheck = new JCheckBox();
 
+    static JButton terugKnop = new JButton("Terug");
+
 
     public static void main(String[] args) {
+
+        UptimeField.setText("0 seconden");
+        DowntimeField.setText("0 seconden");
+
+        procesbelastingProgressBar.setValue(0);
+        beschikbaarheidProgressBar.setValue(0);
+        diskUsageProgressBar.setValue(0);
+
+        procesbelastingProgressBar.setString("");
+        beschikbaarheidProgressBar.setString("");
+        diskUsageProgressBar.setString("");
+
+        beschikbaarheidsCheck.setSelected(false);
 
         JFrame frame = new JFrame("Graphic Tracer Monitoring");
         frame.setSize(720, 450);
@@ -81,10 +96,9 @@ public class MonitorGUI {
 //            }
 //        }).start();
 
-
         new Thread(() -> {
             try {
-                serverSocket = new ServerSocket(6969);
+                serverSocket = new ServerSocket(6789);
                 while (true) {
                     handleClient(serverSocket.accept());
                 }
@@ -108,7 +122,9 @@ public class MonitorGUI {
             }
         });
 
-        new Thread(() -> {
+        Thread beschikbaarheidThread = new Thread(() -> {
+
+
             int totalTicks = 0;
             int ticksAlive = 0;
 
@@ -130,7 +146,7 @@ public class MonitorGUI {
                     DowntimeField.setText((Duration.between(laatsteUpdate, Instant.now())).getSeconds()+" seconden");
                     beschikbaarheidsCheck.setSelected(false);
                 } else {
-                    DowntimeField.setText("");
+                    DowntimeField.setText("0 seconden");
                 }
 
                 totalTicks++;
@@ -150,7 +166,28 @@ public class MonitorGUI {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
+        beschikbaarheidThread.start();
+
+
+        frame.add(new JLabel(), "push, wrap");
+        frame.add(terugKnop);
+        terugKnop.addActionListener((ef)->{
+            eersteVerbindingstijd = null;
+            beschikbaarheidThread.stop();
+            try {
+                serverSocket.close();
+                for(Socket socket : serverTime.keySet()){
+                    socket.close();
+                }
+                serverTime.clear();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            new Thread(StartPagina::new).start();
+            frame.dispose();
+        });
+//        frame.pack();
 
         frame.setVisible(true);
     }
