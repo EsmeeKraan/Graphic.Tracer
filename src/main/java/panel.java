@@ -1,9 +1,14 @@
+import net.miginfocom.swing.MigLayout;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 
 class t {
@@ -43,6 +48,9 @@ class array {
 }
 
 public class panel extends JFrame implements ActionListener {
+
+    JButton terugKnop = new JButton("Terug");
+
     array array_category = new array(5);
     JPanel[] panel_array = new JPanel[array_category.max];
     Drag dragicon = new Drag();
@@ -55,10 +63,10 @@ public class panel extends JFrame implements ActionListener {
         array_category.insert(xd);
 
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, 200));
-        panel.setMaximumSize(new Dimension(200, 200));
+//        panel.setPreferredSize(new Dimension(200, 200));
+//        panel.setMaximumSize(new Dimension(200, 200));
         panel.setBorder(BorderFactory.createTitledBorder(array_category.get_element(array_category.item_count).name));
-
+        panel.setLayout(new MigLayout("al center center, wrap", "[grow,fill]", "[grow,fill]"));
         panel_array[array_category.item_count] = panel;
 
         array_category.item_count++;
@@ -140,6 +148,7 @@ public class panel extends JFrame implements ActionListener {
         JPanel DBserver = create_category("Databaseserver");
         JPanel Webserver = create_category("Webserver");
         JPanel Firewall = create_category("Firewall");
+//        Firewall.setPreferredSize(new Dimension(200, 75));
 
 
 
@@ -148,7 +157,7 @@ public class panel extends JFrame implements ActionListener {
             Icon icon1 = new Icon("icons/server.png", 30, 30, "JBHAL900" + i + "W");
             var event = new LabelClicked(icon1);
             icon1.label.addMouseListener(event);
-            Webserver.add(icon1.get_label());
+            Webserver.add(icon1.get_label(), "wrap");
         }
 
         //DatabaseServer
@@ -156,7 +165,7 @@ public class panel extends JFrame implements ActionListener {
             Icon icon1 = new Icon("icons/server.png", 30, 30, "JBHAL900" + i + "DB");
             var event = new LabelClicked(icon1);
             icon1.label.addMouseListener(event);
-            DBserver.add(icon1.get_label());
+            DBserver.add(icon1.get_label(), "wrap");
         }
 
         //Firewall
@@ -164,12 +173,19 @@ public class panel extends JFrame implements ActionListener {
             Icon icon1 = new Icon("icons/firewallserver.png", 30, 30, "JBHAL900" + i + "FW");
             var event = new LabelClicked(icon1);
             icon1.label.addMouseListener(event);
-            Firewall.add(icon1.get_label());
+            Firewall.add(icon1.get_label(), "wrap");
         }
 
-        beschikbareOptiesPaneel.add(DBserver);
-        beschikbareOptiesPaneel.add(Webserver);
-        beschikbareOptiesPaneel.add(Firewall);
+        beschikbareOptiesPaneel.add(DBserver, "wrap, growprioy 100");
+        beschikbareOptiesPaneel.add(Webserver, "wrap, growprioy 100");
+        beschikbareOptiesPaneel.add(Firewall, "wrap, growprioy 50");
+        beschikbareOptiesPaneel.add(terugKnop, "wrap, growprioy 50");
+
+        terugKnop.addActionListener((ef)->{
+            new Thread(StartPagina::new).start();
+            frame.dispose();
+            Arrays.stream(SluitFrame.getFrames()).forEach(frame1 -> frame1.dispose());
+        });
 
         this.Webservers.setDragEnabled(true);
         this.DBservers.setDragEnabled(true);
@@ -182,7 +198,7 @@ public class panel extends JFrame implements ActionListener {
         //beschikbareOptiesPaneel.setBackground(new Color(255,255,255));
 //        beschikbareOptiesPaneel.setLayout(new BoxLayout(beschikbareOptiesPaneel, BoxLayout.X_AXIS));
 //        beschikbareOptiesPaneel.setLayout(new GridLayout(3, 1));
-        beschikbareOptiesPaneel.setLayout(new FlowLayout());
+        beschikbareOptiesPaneel.setLayout(new MigLayout("al center center, wrap", "[grow,fill]", "[grow,fill]"));
         beschikbareOptiesPaneel.setVisible(true);
 
 //        JPanel pnlr = new JPanel();
@@ -193,6 +209,7 @@ public class panel extends JFrame implements ActionListener {
         frame.add(beschikbareOptiesPaneel);
 
         frame.add(second_panel);
+
         frame.setLayout(new GridLayout(1, 2));
         frame.setSize(800, 600);
         frame.setVisible(true);
