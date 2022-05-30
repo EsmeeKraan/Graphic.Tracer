@@ -83,8 +83,8 @@ public class panel extends JFrame implements ActionListener {
 
         Box second_panel = Box.createVerticalBox();
         Font font = new Font("Courier",Font.BOLD,14);
-        JLabel BLabel = new JLabel("Beschikbaarheidspercentage:");
-        JLabel TLabel = new JLabel("Totale jaarlijkse kosten:");
+        JLabel BLabel = new JLabel("Beschikbaarheidspercentage: " + totalAvailability);
+        JLabel TLabel = new JLabel("Totale jaarlijkse kosten: " + totalPrice);
         Optimaliseren = new JButton("Optimaliseren");
         Optimaliseren.addActionListener((ActionListener) this);
 
@@ -201,6 +201,7 @@ public class panel extends JFrame implements ActionListener {
 
         createClose();
     }
+
     public void createClose() {
         JFrame frame = new JFrame("Graphic Tracer");
         frame.addWindowListener(new WindowAdapter() {
