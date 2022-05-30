@@ -1,31 +1,41 @@
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Components {
 
-    public static int price;
-    public static double availability;
-    public static String name;
+    public ImageIcon icon;
+    public int price;
+    public double availability;
+    public String name;
+    public ComponentSpecies type;
 
 
-    public Components(String name, double availability, int price, ComponentSpecies serverType) {
+    public Components(ImageIcon imageIcon, String name, double availability, int price, ComponentSpecies serverType) {
+        this.icon = imageIcon;
         this.name = name;
         this.availability = availability;
         this.price = price;
+        this.type = serverType;
     }
 
-    private static final ArrayList<Components> Components = new ArrayList<>();
+    public static final ArrayList<Components> ALL_COMPONENTS = new ArrayList<>();
 
     static {
+        final var icon = new ImageIcon(Objects.requireNonNull(Components.class.getResource("icons/server.png")));
+        icon.setImage(icon.getImage().getScaledInstance(30, 30, 1));
+
+
         //toevoegen van database servers
-        Components.add(new Components("HAL9001DB", 90.000, 5100, ComponentSpecies.DbServer));
-        Components.add(new Components("HAL9002DB", 95.000, 7700, ComponentSpecies.DbServer));
-        Components.add(new Components("HAL9003DB", 99.000, 9800, ComponentSpecies.DbServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9001DB", 90.000, 5100, ComponentSpecies.DbServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9002DB", 95.000, 7700, ComponentSpecies.DbServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9003DB", 99.000, 9800, ComponentSpecies.DbServer));
         //toevoegen van webservers
-        Components.add(new Components("HAL9001W", 80.000, 2200, ComponentSpecies.WServer));
-        Components.add(new Components("HAL9002W", 90.000, 3200, ComponentSpecies.WServer));
-        Components.add(new Components("HAL9003W", 95.000, 5100, ComponentSpecies.WServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9001W", 80.000, 2200, ComponentSpecies.WServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9002W", 90.000, 3200, ComponentSpecies.WServer));
+        ALL_COMPONENTS.add(new Components(icon, "HAL9003W", 95.000, 5100, ComponentSpecies.WServer));
         //toevoegen van pfsense
-        Components.add(new Components("pfSense", 99.998, 4000, ComponentSpecies.PfSense));
+        ALL_COMPONENTS.add(new Components(icon, "pfSense", 99.998, 4000, ComponentSpecies.PfSense));
     }
 }
 

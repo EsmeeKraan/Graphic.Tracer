@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import java.util.Locale;
 
 class t {
     String name = "";
@@ -51,9 +50,9 @@ public class panel extends JFrame implements ActionListener {
     Drag dragicon = new Drag();
     private JButton Optimaliseren;
 
-    DefaultListModel<Components> totaleComponentenList = new DefaultListModel<>();
+    DefaultListModel<GeplaatstComponent> totaleComponentenList = new DefaultListModel<>();
 
-    public JList<Components> totaleComponenten = new JList<>(totaleComponentenList);
+    public JList<GeplaatstComponent> totaleComponenten = new JList<>(totaleComponentenList);
 
 
     JPanel create_category(String name) {
@@ -71,26 +70,11 @@ public class panel extends JFrame implements ActionListener {
         return panel;
     }
 
-    JLabel BLabel = new JLabel("Verwachtte beschikbaarheid: 0%");
-
-        // Berekening van de jaarlijkse kosten
-        JLabel TLabel = new JLabel("Totale jaarlijkse kosten: \u20AC 0");
-    private void addComponent(Components components) {
-        float totalCost = 0;
-        totaleComponentenList.addElement(components);
-            for (int i = 0; i < totaleComponentenList.size(); ++i) {
-                components = totaleComponentenList.getElementAt(i);
-                totalCost += components.price;
-
-                TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
-            }
-    }
-
-
     void initialize() {
         file_dialog_funcs dialog_funcs = new file_dialog_funcs();
 
         JFrame frame = new JFrame();
+        
         dialog_funcs.initialize(frame);
         frame.setResizable(true);
         frame.setTitle("Graphic Tracer");
@@ -104,6 +88,8 @@ public class panel extends JFrame implements ActionListener {
 
         Box overzichtPaneel = Box.createVerticalBox();
         Font font = new Font("Courier",Font.BOLD,14);
+        JLabel BLabel = new JLabel("Beschikbaarheidspercentage: " + totalAvailability);
+        JLabel TLabel = new JLabel("Totale jaarlijkse kosten: " + totalPrice);
         Optimaliseren = new JButton("Optimaliseren");
         Optimaliseren.addActionListener((ActionListener) this);
 
@@ -131,8 +117,19 @@ public class panel extends JFrame implements ActionListener {
         FireLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         FireLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
+<<<<<<< HEAD
+        //DataLabel
+        second_panel.add(DataLabel);
+        DataLabel.setFont(font);
+        DataLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        DataLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        //BLabel
+        second_panel.add(BLabel);
+=======
         // BLabel
         overzichtPaneel.add(BLabel);
+>>>>>>> 9f0a29aeab979093c72bdb839dabbcfc09f2fe9a
         BLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         BLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
@@ -141,12 +138,27 @@ public class panel extends JFrame implements ActionListener {
         TLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         TLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
+<<<<<<< HEAD
+
+        // positie Geselecteerde componenten box
+        second_panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        second_panel.setAlignmentY(Component.TOP_ALIGNMENT);
+        second_panel.setMaximumSize(new Dimension(200, 200));
+        second_panel.setBorder(BorderFactory.createTitledBorder("Geselecteerde componenten"));
+=======
+        //DLabel
+        overzichtPaneel.add(DLabel);
+        DLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        DLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
 
         // positie Geselecteerde componenten box
         overzichtPaneel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         overzichtPaneel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 //        overzichtPaneel.setMaximumSize(new Dimension(800, 400));
         overzichtPaneel.setBorder(BorderFactory.createTitledBorder("Geselecteerde componenten"));
+>>>>>>> 9f0a29aeab979093c72bdb839dabbcfc09f2fe9a
+
 
         // Optimaliseren button
         overzichtPaneel.add(Optimaliseren);
@@ -158,19 +170,38 @@ public class panel extends JFrame implements ActionListener {
 
 
 
-        for (Components components : Components.ALL_COMPONENTS) {
-            final var icon = new Icon("icons/server.png", 30, 30, components.name);
-            icon.label.addMouseListener(new MouseAdapter() {
+        //Webserver
+        for (int i = 1; i < 4; i++) {
+            Icon icon1 = new Icon("icons/server.png", 30, 30, "HAL900" + i + "W");
+            var event = new LabelClicked(icon1);
+            icon1.label.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    addComponent(components);
+                    totaleComponentenList.addElement(new GeplaatstComponent(icon1.get_label().getText(), icon1.get_icon()));
                 }
             });
-            switch (components.type) {
-                case WServer -> Webserver.add(icon.get_label(), "wrap");
-                case DbServer -> DBserver.add(icon.get_label(), "wrap");
-                case PfSense -> Firewall.add(icon.get_label(), "wrap");
-            }
+            Webserver.add(icon1.get_label(), "wrap");
+        }
+
+        //DatabaseServer
+        for (int i = 1; i < 4; i++) {
+            Icon icon1 = new Icon("icons/server.png", 30, 30, "HAL900" + i + "DB");
+            var event = new LabelClicked(icon1);
+            icon1.label.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    totaleComponentenList.addElement(new GeplaatstComponent(icon1.get_label().getText(), icon1.get_icon()));
+                }
+            });
+            DBserver.add(icon1.get_label(), "wrap");
+        }
+
+        //Firewall
+        for (int i = 0; i < 1; i++) {
+            Icon icon1 = new Icon("icons/firewallserver.png", 30, 30, "JBHAL900" + i + "FW");
+            var event = new LabelClicked(icon1);
+            icon1.label.addMouseListener(event);
+            Firewall.add(icon1.get_label(), "wrap");
         }
 
         beschikbareOptiesPaneel.add(Webserver, "wrap, growprioy 100");
@@ -221,6 +252,7 @@ public class panel extends JFrame implements ActionListener {
 
         createClose();
     }
+
     public void createClose() {
         JFrame frame = new JFrame("Graphic Tracer");
         frame.addWindowListener(new WindowAdapter() {
@@ -242,9 +274,5 @@ public class panel extends JFrame implements ActionListener {
 //        if(answer == JOptionPane.YES_OPTION){
 //
 //        }
-    }
-
-    public DefaultListModel<Components> getTotaleComponentenList() {
-        return totaleComponentenList;
     }
 }

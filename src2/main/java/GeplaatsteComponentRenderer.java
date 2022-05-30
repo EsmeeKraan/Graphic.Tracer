@@ -23,9 +23,9 @@ class GeplaatsteComponentRenderer extends DefaultListCellRenderer {
             boolean selected,
             boolean expanded) {
 
-        Components component = (Components) value;
-        label.setIcon(component.icon);
-        label.setText(component.name);
+        GeplaatstComponent component = (GeplaatstComponent) value;
+        label.setIcon(component.icon());
+        label.setText(component.naam());
 //        label.setToolTipText(file.getPath());
 
         if (selected) {
