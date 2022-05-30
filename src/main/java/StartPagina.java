@@ -23,8 +23,8 @@ public class StartPagina extends JFrame {
 
         MonitorButton.addActionListener(e->{
             try {
-                MonitorGUI.main(null);
                 new Thread(() -> {
+                    MonitorGUI.main(null);
                     try {
                         Thread.sleep(2000);
                     } catch (Exception ignored) {}
@@ -41,8 +41,7 @@ public class StartPagina extends JFrame {
         });
 
         OntwerperButton.addActionListener(e -> {
-            new main();
-            new SluitFrame().setVisible(true);
+            new Thread(main::new).start();
             dispose();
         });
 
