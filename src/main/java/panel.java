@@ -71,22 +71,93 @@ public class panel extends JFrame implements ActionListener {
         return panel;
     }
 
+    // Berekening van beschikbaarheid
     JLabel BLabel = new JLabel("Verwachtte beschikbaarheid: 0%");
 
-        // Berekening van de jaarlijkse kosten
-        JLabel TLabel = new JLabel("Totale jaarlijkse kosten: \u20AC 0");
-    private void addComponent(Components components) {
-        float totalCost = 0;
-        totaleComponentenList.addElement(components);
-            for (int i = 0; i < totaleComponentenList.size(); ++i) {
-                components = totaleComponentenList.getElementAt(i);
-                totalCost += components.price;
 
-                TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
+    // Berekening van de jaarlijkse kosten
+    JLabel TLabel = new JLabel("Totale jaarlijkse kosten: \u20AC 0");
+    float totalCost = 0;
+
+    // servers
+    private final JLabel WebLabel = new JLabel("Webserver(s): 0");
+    private final JLabel DBLabel = new JLabel("Databaseserver(s): 0");
+    private final JLabel FireLabel = new JLabel("Firewall: 0");
+
+    private void updateAvailability() {
+        // 1. Per categorie (ComponentSpecies) uitrekenen
+        final var subavailabilities = new double[3];
+        for (int i = 0; i < 3; ++i)
+            subavailabilities[i] = 1;
+
+        for (int i = 0; i < totaleComponentenList.size(); ++i) {
+            final var component = totaleComponentenList.getElementAt(i);
+            switch (component.type) {
+                case DbServer -> subavailabilities[0] *= 1 - (component.availability / 100);
+                case WServer -> subavailabilities[1] *= 1 - (component.availability / 100);
+                case PfSense -> subavailabilities[2] *= 1 - (component.availability / 100);
             }
+        }
+
+        // 2. Categorieën samenvoegen
+        float totalAvailability = 1;
+        for (double subAvailability : subavailabilities) {
+            if (subAvailability == 1)
+                continue;
+            totalAvailability *= 1 - subAvailability;
+        }
+
+        BLabel.setText("Verwachtte beschikbaarheid: " + String.format("%.4f", 100*totalAvailability) + "%");
     }
 
+    private static String formatCount(int count) {
+        if (count == 1)
+            return ": 1";
+        return "s: " + count;
+    }
 
+    private void updateComponentCounts() {
+        // 1. Per categorie (ComponentSpecies) uitrekenen
+        final var counts = new int[3];
+
+        for (int i = 0; i < totaleComponentenList.size(); ++i) {
+            final var component = totaleComponentenList.getElementAt(i);
+            switch (component.type) {
+                case DbServer -> counts[0] += 1;
+                case WServer -> counts[1] += 1;
+                case PfSense -> counts[2] += 2;
+            }
+        }
+
+        DBLabel.setText("Databaseserver" + formatCount(counts[0]));
+        WebLabel.setText("Webserver" + formatCount(counts[1]));
+        FireLabel.setText("Firewall" + formatCount(counts[2]));
+    }
+
+    private void addComponent(Components components) {
+        totalCost = 0;
+        totaleComponentenList.addElement(components);
+        updateAvailability();
+        updateComponentCounts();
+        for (int i = 0; i < totaleComponentenList.size(); ++i) {
+            components = totaleComponentenList.getElementAt(i);
+            totalCost += components.price;
+        }
+        TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
+    }
+    private void removeComponent(Components components) {
+        for (int i = 0; i < totaleComponentenList.size(); ++i) {
+            components = totaleComponentenList.getElementAt(i);
+            totalCost = 0;
+
+            for (int k = 0; k < totaleComponentenList.size(); k++){
+                components = totaleComponentenList.getElementAt(k);
+                totalCost += components.price;
+            }}
+        updateAvailability();
+        updateComponentCounts();
+        TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
+    }
     void initialize() {
         file_dialog_funcs dialog_funcs = new file_dialog_funcs();
 
@@ -106,12 +177,6 @@ public class panel extends JFrame implements ActionListener {
         Font font = new Font("Courier",Font.BOLD,14);
         Optimaliseren = new JButton("Optimaliseren");
         Optimaliseren.addActionListener((ActionListener) this);
-
-        // servers
-        JLabel WebLabel = new JLabel("Webserver(s):");
-        JLabel DBLabel = new JLabel("Databaseserver(s):");
-        JLabel FireLabel = new JLabel("Firewall:");
-        JLabel DataLabel = new JLabel("Gegevens opzet:");
 
         //Weblabel
         overzichtPaneel.add(WebLabel);
@@ -157,7 +222,7 @@ public class panel extends JFrame implements ActionListener {
 //        Firewall.setPreferredSize(new Dimension(200, 75));
 
 
-
+        // Hier worden componenten toegevoegd
         for (Components components : Components.ALL_COMPONENTS) {
             final var icon = new Icon("icons/server.png", 30, 30, components.name);
             icon.label.addMouseListener(new MouseAdapter() {
@@ -192,11 +257,16 @@ public class panel extends JFrame implements ActionListener {
         geplaatsteComponenten.add(verwijderButton, "growprioy 10");
         verwijderButton.addActionListener(e -> {
             if(totaleComponenten.isSelectionEmpty()){
+                totalCost = 0;
                 return;
             }
             final var list = totaleComponenten.getSelectedIndices();
             for (int i = list.length - 1; i >= 0; --i)
                 totaleComponentenList.remove(list[i]);
+            totalCost = 0;
+            for (Components components : Components.ALL_COMPONENTS) {
+                removeComponent(components);
+            }
         });
 
 

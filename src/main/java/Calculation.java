@@ -22,20 +22,6 @@ public class Calculation {
     }
 
     // Berekening van de totale prijs per jaar
-
-
-    private int getPrice(Components[] components) {
-        if (components == null) {
-            return 999999999;
-        }
-
-        for (Components component : components) {
-            totalPrice += component.price;
-        }
-
-        return totalPrice;
-    }
-
     // hier returnt hij de beschikbaarheid per toegevoegde component
     public double getAvailability (Components[]components){
         if (components == null) {
