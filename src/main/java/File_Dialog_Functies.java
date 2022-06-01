@@ -5,10 +5,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.*;
 import javax.swing.*;
 
-public class file_dialog_funcs
+public class File_Dialog_Functies
 {
     static StringBuilder category = new StringBuilder();
 

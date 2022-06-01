@@ -159,7 +159,7 @@ public class panel extends JFrame implements ActionListener {
         TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
     }
     void initialize() {
-        file_dialog_funcs dialog_funcs = new file_dialog_funcs();
+        File_Dialog_Functies dialog_funcs = new File_Dialog_Functies();
 
         JFrame frame = new JFrame();
         dialog_funcs.initialize(frame);
