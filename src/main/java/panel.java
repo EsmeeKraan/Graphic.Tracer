@@ -108,6 +108,10 @@ public class panel extends JFrame {
             totalAvailability *= 1 - subAvailability;
         }
 
+        if(totalAvailability == 1){
+            totalAvailability = 0;
+        }
+
         BLabel.setText("Verwachtte beschikbaarheid: " + String.format("%.4f", 100*totalAvailability) + "%");
     }
 
