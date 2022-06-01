@@ -33,19 +33,6 @@ public class main {
             ex.printStackTrace();
             System.exit(1);
         }
-        // prepare files
-        JsonFileWriter<String> jsonFileWriter = new JsonFileWriter<>();
-        ArrayList<String> webservers = new ArrayList<>();
-        jsonFileWriter.WriteToJsonFile(webservers, "webservers.json");
-//        new main();
         new StartPagina();
-//        new Drag();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-//                new SluitFrame().setVisible(true);
-            }
-        });
     }
 }

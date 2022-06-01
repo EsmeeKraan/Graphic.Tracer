@@ -1,4 +1,7 @@
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +14,7 @@ import javax.swing.*;
 import javax.swing.JOptionPane;
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.Collections;
 
 
 public class File_Dialog_Functies
@@ -18,7 +22,7 @@ public class File_Dialog_Functies
     static StringBuilder category = new StringBuilder();
 
 
-    public void initialize(JFrame window)
+    public void initialize(panel window)
     {
         JMenuBar menuBar = new JMenuBar();
 
@@ -66,26 +70,53 @@ public class File_Dialog_Functies
         menuBestand.add(opslaan_bestand);
         menuBestand.add(update);
 
-        window.setJMenuBar(menuBar);
+        window.frame.setJMenuBar(menuBar);
     }
 
 
-    public void open_file(JFrame window)
+    public void open_file(panel window)
     {
         Dialog dg = new Dialog(window);
         FileDialog open_file_dialog = new FileDialog(dg,"",FileDialog.LOAD);
 
         open_file_dialog.setVisible(true);
+
+        if(open_file_dialog.getFile() != null){
+            window.totaleComponentenList.clear();
+            Gson gson = new Gson();
+            try {
+                final var values = Files.readString(Path.of(open_file_dialog.getFile()));
+                final var items = JsonParser.parseString(values).getAsJsonArray();
+                for(final var item : items){
+                    final var component = gson.fromJson(item, Components.class);
+                    if(component.type == ComponentSpecies.PfSense){
+                        component.icon = Components.firewall;
+                    } else {
+                        component.icon = Components.normaleIcon;
+                    }
+                    window.addComponent(component);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
-    public FileDialog save_file(JFrame window)
+    public FileDialog save_file(panel window)
     {
         Dialog dg = new Dialog(window);
         FileDialog save_file_dialog = new FileDialog(dg,"",FileDialog.SAVE);
 
         save_file_dialog.setVisible(true);
 
-        write_to_file(save_file_dialog.getFiles()[0], "texthier");
+//        write_to_file(save_file_dialog.getFiles()[0], "texthier");
+
+        if(save_file_dialog.getFile() != null){
+            Gson gson = new Gson();
+            final var elements = window.totaleComponentenList.elements();
+            write_to_file(new File(save_file_dialog.getFile()), gson.toJson(Collections.list(elements)));
+        }
 
         return save_file_dialog;
     }
@@ -106,16 +137,16 @@ public class File_Dialog_Functies
 
     public void updates(JFrame frame) throws URISyntaxException, IOException {
 
-       int response = JOptionPane.showConfirmDialog(null, "Er is een update bescikbaar, wilt u deze nu downloaden?", "update!", JOptionPane.YES_NO_OPTION);
+       int response = JOptionPane.showConfirmDialog(null, "Er is een update beschikbaar, wilt u deze nu downloaden?", "Update!", JOptionPane.YES_NO_OPTION);
 
         if(response==JOptionPane.YES_OPTION){
 
             Desktop d = Desktop.getDesktop();
             d.browse(new URI("https://github.com/EsmeeKraan/Graphic.Tracer"));
-
-            JOptionPane.showMessageDialog(null, d);
         }
     }
+
+
 
 
 }

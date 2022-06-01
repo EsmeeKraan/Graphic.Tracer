@@ -9,10 +9,10 @@ public class Icon extends MouseAdapter {
     ImageIcon icon;
     JLabel label;
 
-    public Icon(String path, int w, int h, String txt)
+    public Icon(ImageIcon icon, int w, int h, String txt)
     {
-        icon = new ImageIcon(getClass().getResource(path));
-        icon.setImage(icon.getImage().getScaledInstance(w, h, 1));
+//        icon = new ImageIcon(getClass().getResource(path));
+        this.icon = new ImageIcon(icon.getImage().getScaledInstance(w, h, 1));
 
         label = new JLabel(icon, SwingConstants.LEFT);
         label.setVerticalAlignment(SwingConstants.TOP);

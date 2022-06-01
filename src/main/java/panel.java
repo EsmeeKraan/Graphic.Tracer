@@ -42,16 +42,17 @@ class array {
     }
 }
 
-public class panel extends JFrame implements ActionListener {
+public class panel extends JFrame {
 
     JButton terugKnop = new JButton("Terug");
 
     array array_category = new array(5);
     JPanel[] panel_array = new JPanel[array_category.max];
     Drag dragicon = new Drag();
-    private JButton Optimaliseren;
 
     DefaultListModel<Components> totaleComponentenList = new DefaultListModel<>();
+
+    JFrame frame = new JFrame();
 
     public JList<Components> totaleComponenten = new JList<>(totaleComponentenList);
 
@@ -125,7 +126,7 @@ public class panel extends JFrame implements ActionListener {
             switch (component.type) {
                 case DbServer -> counts[0] += 1;
                 case WServer -> counts[1] += 1;
-                case PfSense -> counts[2] += 2;
+                case PfSense -> counts[2] += 1;
             }
         }
 
@@ -134,7 +135,7 @@ public class panel extends JFrame implements ActionListener {
         FireLabel.setText("Firewall" + formatCount(counts[2]));
     }
 
-    private void addComponent(Components components) {
+    public void addComponent(Components components) {
         totalCost = 0;
         totaleComponentenList.addElement(components);
         updateAvailability();
@@ -161,8 +162,7 @@ public class panel extends JFrame implements ActionListener {
     void initialize() {
         File_Dialog_Functies dialog_funcs = new File_Dialog_Functies();
 
-        JFrame frame = new JFrame();
-        dialog_funcs.initialize(frame);
+        dialog_funcs.initialize(this);
         frame.setResizable(true);
         frame.setTitle("Graphic Tracer");
 //        frame.setIconImage("");
@@ -175,8 +175,6 @@ public class panel extends JFrame implements ActionListener {
 
         Box overzichtPaneel = Box.createVerticalBox();
         Font font = new Font("Courier",Font.BOLD,14);
-        Optimaliseren = new JButton("Optimaliseren");
-        Optimaliseren.addActionListener((ActionListener) this);
 
         //Weblabel
         overzichtPaneel.add(WebLabel);
@@ -213,8 +211,6 @@ public class panel extends JFrame implements ActionListener {
 //        overzichtPaneel.setMaximumSize(new Dimension(800, 400));
         overzichtPaneel.setBorder(BorderFactory.createTitledBorder("Geselecteerde componenten"));
 
-        // Optimaliseren button
-        overzichtPaneel.add(Optimaliseren);
 
         JPanel DBserver = create_category("Databaseserver");
         JPanel Webserver = create_category("Webserver");
@@ -224,7 +220,7 @@ public class panel extends JFrame implements ActionListener {
 
         // Hier worden componenten toegevoegd
         for (Components components : Components.ALL_COMPONENTS) {
-            final var icon = new Icon("icons/server.png", 30, 30, components.name);
+            final var icon = new Icon(components.icon, 30, 30, components.name);
             icon.label.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -303,16 +299,6 @@ public class panel extends JFrame implements ActionListener {
                 }
             }
         });}
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == Optimaliseren) {
-            OptimalizeDialoog dialog = new OptimalizeDialoog(this);
-        }
-//        if(answer == JOptionPane.YES_OPTION){
-//
-//        }
-    }
 
     public DefaultListModel<Components> getTotaleComponentenList() {
         return totaleComponentenList;

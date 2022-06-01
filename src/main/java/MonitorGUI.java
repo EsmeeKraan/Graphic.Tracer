@@ -31,6 +31,7 @@ public class MonitorGUI {
     static JTextField DowntimeField = new JTextField(3);
 
     static Instant eersteVerbindingstijd = null;
+    static Long totalesecondevorigeVerbinding = null;
 
     static JCheckBox beschikbaarheidsCheck = new JCheckBox();
 
@@ -95,22 +96,11 @@ public class MonitorGUI {
 //            }
 //        }).start();
 
-        new Thread(() -> {
-            try {
-                serverSocket = new ServerSocket(6789);
-                while (true) {
-                    handleClient(serverSocket.accept());
-                }
-
-            } catch (Exception t) {
-                t.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Er is een fout opgetreden!");
-            }
-        }).start();
+        startserver();
 
         frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent ev){
-                if(serverSocket != null){
+            public void windowClosing(WindowEvent ev) {
+                if (serverSocket != null) {
                     try {
                         serverSocket.close();
                     } catch (IOException e) {
@@ -123,29 +113,27 @@ public class MonitorGUI {
 
         Thread beschikbaarheidThread = new Thread(() -> {
 
-
             int totalTicks = 0;
             int ticksAlive = 0;
 
             Instant laatsteUpdate = null;
 
-            while(true){
+            while (true) {
                 boolean wasOnline = false;
-                if(!serverTime.isEmpty()){
+                if (!serverTime.isEmpty()) {
                     long time = serverTime.values().iterator().next();
                     long delta = System.currentTimeMillis() - time;
 
-                    if(delta < 3000){
+                    if (delta < 3000) {
                         ticksAlive++;
                         wasOnline = true;
                         laatsteUpdate = Instant.now();
                     }
                 }
-                if(!wasOnline && laatsteUpdate != null){
-                    DowntimeField.setText((Duration.between(laatsteUpdate, Instant.now())).getSeconds()+" seconden");
+
+                if (!wasOnline && laatsteUpdate != null) {
+                    DowntimeField.setText((Duration.between(laatsteUpdate, Instant.now())).getSeconds() + " seconden");
                     beschikbaarheidsCheck.setSelected(false);
-                } else {
-                    DowntimeField.setText("0 seconden");
                 }
 
                 totalTicks++;
@@ -154,10 +142,18 @@ public class MonitorGUI {
 
                 beschikbaarheidProgressBar.setString("Beschikbaarheid " + String.format("%.2f", beschikbaarheid) + " %");
 
-                if(eersteVerbindingstijd != null && wasOnline){
-                    UptimeField.setText((Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds()+" seconden");
+                if (eersteVerbindingstijd != null && wasOnline) {
+                    var seconden = (Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds();
+//                    if (totalesecondevorigeVerbinding != null) {
+//                        seconden += totalesecondevorigeVerbinding;
+//                    }
+                    seconden -= Long.parseLong(DowntimeField.getText().substring(0, DowntimeField.getText().length() - " seconden".length()));
+                    UptimeField.setText(seconden + " seconden");
                 }
 
+//                if (eersteVerbindingstijd != null && !wasOnline && totalesecondevorigeVerbinding == null) {
+//                    totalesecondevorigeVerbinding = (Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds();
+//                }
 
                 try {
                     Thread.sleep(1000);
@@ -168,16 +164,17 @@ public class MonitorGUI {
         });
         beschikbaarheidThread.start();
 
+
         JButton terugKnop = new JButton("Terug");
         frame.add(new JLabel(), "push, wrap");
         frame.add(terugKnop);
-        terugKnop.addActionListener((ef)->{
+        terugKnop.addActionListener((ef) -> {
             Arrays.stream(StartPagina.getFrames()).forEach(frame1 -> frame1.dispose());
             eersteVerbindingstijd = null;
             beschikbaarheidThread.stop();
             try {
                 serverSocket.close();
-                for(Socket socket : serverTime.keySet()){
+                for (Socket socket : serverTime.keySet()) {
                     socket.close();
                 }
                 serverTime.clear();
@@ -189,15 +186,65 @@ public class MonitorGUI {
         });
 //        frame.pack();
 
+        JButton stopKnop = new JButton("Stop server");
+        frame.add(stopKnop);
+        stopKnop.addActionListener((ef) -> {
+            try {
+                serverSocket.close();
+                for (Socket socket : serverTime.keySet()) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        JButton startKnop = new JButton("Start server");
+        frame.add(startKnop);
+        startKnop.addActionListener((e) -> {
+            startserver();
+            try {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception ignored) {
+                    }
+                    try {
+                        MonitorClient.main(null);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
         frame.setVisible(true);
     }
 
+    public static void startserver() {
+        new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(6789);
+                while (true) {
+                    handleClient(serverSocket.accept());
+                }
+
+            } catch (Exception t) {
+                t.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Er is een fout opgetreden!");
+            }
+        }).start();
+    }
 
 
     public static void handleClient(Socket socket) {
         serverTime.put(socket, System.currentTimeMillis());
 
-        eersteVerbindingstijd = Instant.now();
+        if(eersteVerbindingstijd == null){
+            eersteVerbindingstijd = Instant.now();
+        }
 
         try {
             var input = new Scanner(new BufferedInputStream(socket.getInputStream()));
@@ -209,12 +256,12 @@ public class MonitorGUI {
                 String lijn = input.nextLine();
                 String[] parts = lijn.split(" ");
 
-                if (parts.length != 2){
+                if (parts.length != 2) {
                     JOptionPane.showMessageDialog(null, "Een verouderde monitorserver probeert contact te maken");
                     return;
                 }
-                double processorbelasting = (Double.parseDouble(parts[0])*100);
-                double diskUsage = (Double.parseDouble(parts[1])*100);
+                double processorbelasting = (Double.parseDouble(parts[0]) * 100);
+                double diskUsage = (Double.parseDouble(parts[1]) * 100);
 
                 beschikbaarheidsCheck.setSelected(true);
 
@@ -228,6 +275,7 @@ public class MonitorGUI {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            serverTime.remove(socket);
         }
     }
 
