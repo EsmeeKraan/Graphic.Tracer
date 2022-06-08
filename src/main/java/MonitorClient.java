@@ -17,13 +17,13 @@ public class MonitorClient {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Verbinden met: 192.168.10.21");
-        for (int i = 0; i < args.length; ++i)
-            System.out.printf("%d: %s\n", i, args[i]);
-        Socket socket = new Socket(args[0], Integer.parseInt(args[1]));
-//        if(socket != null){
-//            socket.close();
-//        }
-//        socket = new Socket("localhost", 6789);
+//        for (int i = 0; i < args.length; ++i)
+//            System.out.printf("%d: %s\n", i, args[i]);
+//        Socket socket = new Socket(args[0], Integer.parseInt(args[1]));
+        if(socket != null){
+            socket.close();
+        }
+        socket = new Socket("localhost", 6789);
         var output = socket.getOutputStream();
         OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         while (true) {
@@ -44,7 +44,6 @@ public class MonitorClient {
         double totalUsablespace = 0;
         double totalSpace = 0;
 
-        NumberFormat nf = NumberFormat.getNumberInstance();
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
 
             try {
@@ -58,5 +57,4 @@ public class MonitorClient {
         }
         return 1 - totalUsablespace/totalSpace;
     }
-
 }

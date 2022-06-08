@@ -150,6 +150,7 @@ public class panel extends JFrame {
         }
         TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
     }
+
     private void removeComponent(Components components) {
         for (int i = 0; i < totaleComponentenList.size(); ++i) {
             components = totaleComponentenList.getElementAt(i);
@@ -163,6 +164,7 @@ public class panel extends JFrame {
         updateComponentCounts();
         TLabel.setText(String.format(Locale.ITALIAN, "Totale jaarlijkse kosten: \u20AC %.2f", totalCost));
     }
+
     void initialize() {
         File_Dialog_Functies dialog_funcs = new File_Dialog_Functies();
 

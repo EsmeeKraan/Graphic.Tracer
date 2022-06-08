@@ -113,47 +113,40 @@ public class MonitorGUI {
 
         Thread beschikbaarheidThread = new Thread(() -> {
 
-            int totalTicks = 0;
+            int totalTicks = 0;                                                     // Zodra applicatie runt begint deze te 'tikken'
             int ticksAlive = 0;
 
             Instant laatsteUpdate = null;
 
             while (true) {
-                boolean wasOnline = false;
-                if (!serverTime.isEmpty()) {
-                    long time = serverTime.values().iterator().next();
-                    long delta = System.currentTimeMillis() - time;
+                boolean isOnline = false;
+                if (!serverTime.isEmpty()) {                                        // als de monitoringclient wel een keer verbonden is
+                    long time = serverTime.values().iterator().next();              // de nieuwste servertime ophalen (gebeurt wanneer de client een bericht verstuurd)
+                    long delta = System.currentTimeMillis() - time;                 // huidige tijd - de tijd dat de client een bericht heeft verstuurd
 
-                    if (delta < 3000) {
-                        ticksAlive++;
-                        wasOnline = true;
-                        laatsteUpdate = Instant.now();
+                    if (delta < 3000) {                                             // als er binnen 3s een activiteit wordt gemeten wordt de server als online gemarkeerd.
+                        ticksAlive++;                                               // TicksAlive krijgt 1 erbij
+                        isOnline = true;                                            // De online boolean wordt op true gezet
+                        laatsteUpdate = Instant.now();                              // Hier houden we bij wanneer de laatste update was / wanneer hij voor het laatst online was
                     }
                 }
 
-                if (!wasOnline && laatsteUpdate != null) {
+                if (!isOnline && laatsteUpdate != null) {
                     DowntimeField.setText((Duration.between(laatsteUpdate, Instant.now())).getSeconds() + " seconden");
                     beschikbaarheidsCheck.setSelected(false);
                 }
 
-                totalTicks++;
-                double beschikbaarheid = (ticksAlive * 100d) / totalTicks;
-                beschikbaarheidProgressBar.setValue((int) beschikbaarheid);
+                totalTicks++;                                                       // Elke seconde komt een tik erbij
+                double beschikbaarheid = (ticksAlive * 100d) / totalTicks;          // ticksAlive deel je hier door totalTicks waardoor we de beschikbaarheid meten
+                beschikbaarheidProgressBar.setValue((int) beschikbaarheid);         // (stel ticksalive = 4 en totalticks = 10 (want de server runt al 10 sec) dan is de beschikbaarheid 40%)
 
                 beschikbaarheidProgressBar.setString("Beschikbaarheid " + String.format("%.2f", beschikbaarheid) + " %");
 
-                if (eersteVerbindingstijd != null && wasOnline) {
-                    var seconden = (Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds();
-//                    if (totalesecondevorigeVerbinding != null) {
-//                        seconden += totalesecondevorigeVerbinding;
-//                    }
-                    seconden -= Long.parseLong(DowntimeField.getText().substring(0, DowntimeField.getText().length() - " seconden".length()));
-                    UptimeField.setText(seconden + " seconden");
+                if (eersteVerbindingstijd != null && isOnline) {                    // als de client online is moeten we natuurlijk de uptime tonen
+                    var seconden = (Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds();           // pak het verschil tussen het moment dat hij verbonden is en het huidige moment
+                    seconden -= Long.parseLong(DowntimeField.getText().substring(0, DowntimeField.getText().length() - " seconden".length()));      //haalt het aantal sec downtime eraf
+                    UptimeField.setText(seconden + " seconden");                    // zodat uptime niet 'eersteVerbindingstijd' toont maar de tijd dat de client echt runnend was
                 }
-
-//                if (eersteVerbindingstijd != null && !wasOnline && totalesecondevorigeVerbinding == null) {
-//                    totalesecondevorigeVerbinding = (Duration.between(eersteVerbindingstijd, Instant.now())).getSeconds();
-//                }
 
                 try {
                     Thread.sleep(1000);
@@ -252,7 +245,7 @@ public class MonitorGUI {
                 while (!input.hasNextLine()) {
                     Thread.yield();
                 }
-//                System.out.println("Binnen: " + input.nextLine());
+
                 String lijn = input.nextLine();
                 String[] parts = lijn.split(" ");
 
